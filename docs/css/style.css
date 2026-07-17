@@ -109,6 +109,11 @@ button { font: inherit; cursor: pointer; }
   background: radial-gradient(1200px 700px at 50% 100%, #221708 0%, #14100c 62%);
 }
 .hero3d canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
+.hero3d::after {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 42%;
+  background: linear-gradient(to bottom, rgba(10,14,9,.78), rgba(10,14,9,.35) 55%, transparent);
+  z-index: 1; pointer-events: none;
+}
 .hero3d-ui { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; z-index: 2; }
 .hero3d-head { text-align: center; padding-top: clamp(18px, 4vh, 46px); }
 .hero3d-kicker {
@@ -148,6 +153,45 @@ button { font: inherit; cursor: pointer; }
 .year-slider { width: min(340px, 34vw); accent-color: var(--amber); margin-top: 8px; cursor: pointer; }
 .hero3d-hint { font-family: var(--sans); font-size: 11.5px; color: var(--ink-3); margin-top: 6px; }
 .hero3d.no3d canvas { display: none; }
+
+/* ——— 2D-сцены (SVG) ——— */
+.hero3d svg.drevo2d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
+.leaf-hit { cursor: pointer; }
+.leaf-hit:hover .leaf-person { filter: brightness(1.35); }
+.grove-tree { cursor: pointer; transition: opacity .2s ease; }
+.grove-tree:hover { opacity: 1 !important; }
+.firefly {
+  opacity: 0;
+  animation-name: fireflyfloat;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes fireflyfloat {
+  0%, 100% { opacity: 0; transform: translate(0, 0); }
+  20% { opacity: .8; }
+  50% { opacity: .35; transform: translate(14px, -22px); }
+  80% { opacity: .7; }
+}
+@media (prefers-reduced-motion: reduce) { .firefly { animation: none; opacity: .4; } }
+
+.globe-stage svg.map2d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
+.map-spot { cursor: pointer; }
+.map-spot:hover { fill: #ffffff; }
+.mig-arc {
+  fill: none; stroke: #2b7fd4; stroke-width: 1.3; opacity: .55;
+  stroke-dasharray: 7 11;
+  animation: arcflow 2.6s linear infinite;
+}
+@keyframes arcflow { to { stroke-dashoffset: -18; } }
+@media (prefers-reduced-motion: reduce) { .mig-arc { animation: none; } }
+.country-ours { filter: drop-shadow(0 0 10px rgba(56,209,255,.25)); }
+.country-label {
+  font-family: var(--sans); font-size: 17px; font-weight: 600;
+  fill: #dff4ff; text-anchor: middle;
+  paint-order: stroke; stroke: #03060d; stroke-width: 4px;
+  pointer-events: none;
+}
+.country-count { font-size: 12px; font-weight: 500; fill: #8fc9e8; }
 
 /* тултип 3D */
 .w3d-tip {

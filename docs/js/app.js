@@ -1,5 +1,5 @@
 // Древо рода Житниковых — одностраничное приложение.
-import { renderTree } from "./tree.js?v=d3";
+import { renderTree } from "./tree.js?v=d4";
 
 const app = document.getElementById("app");
 let DB = null;              // {persons, families}
@@ -164,7 +164,7 @@ function renderHome() {
         <div class="year-box">
           <div class="year-num" id="yearNum">${minY}</div>
           <input class="year-slider" id="yearSlider" type="range" min="${minY}" max="${maxY}" value="${minY}" step="1">
-          <div class="hero3d-hint">тяните за год — древо растёт · мышью можно вращать</div>
+          <div class="hero3d-hint">тяните за год — древо растёт · клик по году — вырастить заново</div>
         </div>
       </div>
     </div>
@@ -174,10 +174,10 @@ function renderHome() {
     <div class="globe-head">
       <div class="page-kicker">География рода</div>
       <h2>Где жили и куда шли</h2>
-      <p>Развёрнутая карта: светящиеся точки — места рождений и смертей, дуги — путь от родителей к детям. Карту можно вращать и двигать.</p>
+      <p>Страны, где жил род, — залиты светом. Точки — места рождений и смертей, дуги — путь от родителей к детям.</p>
     </div>
     <div class="globe-stage" id="globeStage">
-      <div class="globe-legend">точка — место · <b>дуга</b> — переезд поколения · клик по точке — кто здесь жил</div>
+      <div class="globe-legend"><b>залитая страна</b> — здесь жил род · точка — место · дуга — переезд поколения · клик по точке — кто здесь жил</div>
       <aside class="globe-panel" id="globePanel" hidden></aside>
     </div>
   </section>
@@ -205,20 +205,11 @@ function renderHome() {
 }
 
 async function initHome3D() {
-  const enable3D = matchMedia("(min-width: 861px)").matches &&
-    !matchMedia("(prefers-reduced-motion: reduce)").matches &&
-    typeof WebGL2RenderingContext !== "undefined";
   const heroEl = document.getElementById("hero3d");
-  if (!enable3D) {
-    heroEl.classList.add("no3d");
-    document.getElementById("globeStage").innerHTML =
-      `<div class="search-hint" style="padding-top:60px">3D-карта доступна на большом экране.</div>`;
-    return;
-  }
   try {
     const [{ mountDrevo }, { mountMap }] = await Promise.all([
-      import("./drevo3d.js?v=d3"),
-      import("./map3d.js?v=d3"),
+      import("./drevo2d.js?v=d4"),
+      import("./map2d.js?v=d4"),
     ]);
     if (!document.getElementById("hero3d")) return; // уже ушли со страницы
     home3d.drevo = mountDrevo(heroEl, DB, {
