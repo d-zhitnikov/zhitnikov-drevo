@@ -1,5 +1,5 @@
 // Древо рода Житниковых — одностраничное приложение.
-import { renderTree } from "./tree.js?v=d4";
+import { renderTree } from "./tree.js?v=d5";
 
 const app = document.getElementById("app");
 let DB = null;              // {persons, families}
@@ -155,18 +155,7 @@ function renderHome() {
           <a class="btn btn-ghost" href="#/timeline">Хроника</a>
         </div>
       </div>
-      <div class="hero3d-foot">
-        <div class="hero3d-legend">
-          <span><span class="dot" style="background:var(--moss)"></span>мох — живые</span>
-          <span><span class="dot" style="background:var(--gold)"></span>янтарь — ушедшие</span>
-          <span style="color:var(--ink-3)">лист — страница человека · деревья вокруг — другие линии рода</span>
-        </div>
-        <div class="year-box">
-          <div class="year-num" id="yearNum">${minY}</div>
-          <input class="year-slider" id="yearSlider" type="range" min="${minY}" max="${maxY}" value="${minY}" step="1">
-          <div class="hero3d-hint">тяните за год — древо растёт · клик по году — вырастить заново</div>
-        </div>
-      </div>
+
     </div>
   </div>
 
@@ -208,15 +197,12 @@ async function initHome3D() {
   const heroEl = document.getElementById("hero3d");
   try {
     const [{ mountDrevo }, { mountMap }] = await Promise.all([
-      import("./drevo2d.js?v=d4"),
-      import("./map2d.js?v=d4"),
+      import("./drevo2d.js?v=d5"),
+      import("./map2d.js?v=d5"),
     ]);
     if (!document.getElementById("hero3d")) return; // уже ушли со страницы
     home3d.drevo = mountDrevo(heroEl, DB, {
-      yearEl: document.getElementById("yearNum"),
-      sliderEl: document.getElementById("yearSlider"),
       onOpenPerson: (id) => { location.hash = `#/person/${id}`; },
-      onFocusLineage: (id) => { location.hash = `#/tree/${id}`; },
     });
     home3d.globe = await mountMap(document.getElementById("globeStage"), DB, {
       onOpenSpot: showGlobeSpot,
