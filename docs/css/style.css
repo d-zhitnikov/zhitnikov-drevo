@@ -102,15 +102,26 @@ button { font: inherit; cursor: pointer; }
 }
 @keyframes bootpulse { 50% { transform: scale(.94); opacity: .82; } }
 
-/* ——— герой: текст сверху, медальон-эмблема ниже ——— */
+/* ——— герой: большое древо во весь экран, заголовок поверх ——— */
 .hero3d {
-  position: relative; min-height: calc(100vh - 67px);
-  display: flex; flex-direction: column; align-items: center;
-  padding: clamp(22px, 5vh, 60px) 20px 40px;
+  position: relative; height: calc(100vh - 67px); min-height: 520px;
   overflow: hidden;
-  background: radial-gradient(1100px 760px at 50% 78%, #241708 0%, #14100c 66%);
+  background: radial-gradient(1300px 900px at 50% 100%, #2a1c0a 0%, #14100c 72%);
 }
-.hero3d-head { text-align: center; }
+.hero3d::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 58%;
+  background:
+    radial-gradient(660px 300px at 50% 30%, rgba(15,11,7,.82), transparent 72%),
+    linear-gradient(to bottom, #14100c 10%, rgba(20,16,12,.8) 46%, transparent);
+  z-index: 2; pointer-events: none;
+}
+.hero3d-head {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+  text-align: center; padding: clamp(16px, 4vh, 48px) 20px 0;
+  pointer-events: none;
+}
+.hero3d-head .btn { pointer-events: auto; }
+.hero3d-sub { text-shadow: 0 1px 10px rgba(10,7,4,.9); }
 .hero3d-kicker {
   font-family: var(--sans); font-size: 11.5px; font-weight: 600;
   letter-spacing: .34em; text-transform: uppercase; color: var(--amber);
@@ -124,11 +135,10 @@ button { font: inherit; cursor: pointer; }
 .hero3d-head h1 em { font-style: italic; color: var(--amber); }
 .hero3d-sub { margin-top: 10px; font-size: 14.5px; color: var(--ink-2); }
 .hero3d-cta {
-  margin-top: 20px; display: flex; gap: 12px; justify-content: center;
+  margin-top: clamp(12px, 2vh, 20px); display: flex; gap: 12px; justify-content: center;
 }
 .hero3d-medallion {
-  width: min(480px, 82vw); aspect-ratio: 1; margin-top: clamp(10px, 2vh, 26px);
-  flex: none;
+  position: absolute; inset: 0; z-index: 1;
 }
 
 /* ——— 2D-сцены (SVG) ——— */

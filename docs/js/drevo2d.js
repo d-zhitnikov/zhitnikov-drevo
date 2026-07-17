@@ -1,10 +1,10 @@
-// Эмблема рода Житниковых: золотое древо-жизни в кольце.
-// Ствол делится на суки, суки — на ветви (фрактал), на кончиках — листья-люди.
-// Два цвета: коричневый и золото. Живая самопрорисовка при загрузке.
+// Древо рода Житниковых — большое золотое дерево-жизни, во всю ширину экрана.
+// Ствол ветвится фракталом на суки и ветви, на кончиках — листья-люди.
+// Два цвета: коричневый и золото. Живая самопрорисовка при загрузке. Без кольца.
 
 const NS = "http://www.w3.org/2000/svg";
 const GOLD = "#d8a54e";       // листья
-const GOLD_DIM = "#c08238";   // ветви, кольцо
+const GOLD_DIM = "#c08238";   // ветви
 const GROW_YEARS = 16;
 
 // ————— данные: люди главной линии по годам —————
@@ -38,56 +38,31 @@ function mkRand(seed) {
 const LEAF_D = "M0 0 C 4.2 -1.6, 5.8 -7.6, 0 -12 C -5.8 -7.6, -4.2 -1.6, 0 0 Z";
 
 export function mountDrevo(container, DB, ui) {
-  const W = 900, H = 900, R = 396, CX = 450, CY = 450;
+  // широкий кадр под пропорции экрана: дерево во всю ширину, стоит у низа
+  const W = 1440, H = 820;
+  const CX = W / 2;
+  const baseY = H - 90;               // основание ствола
+  const forkY = H * 0.52;             // где ствол переходит в крону
   const svg = document.createElementNS(NS, "svg");
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  svg.setAttribute("preserveAspectRatio", "xMidYMax meet");
   svg.classList.add("drevo2d");
   container.appendChild(svg);
-
-  const defs = document.createElementNS(NS, "defs");
-  defs.innerHTML = `
-    <radialGradient id="field" cx="50%" cy="42%" r="70%">
-      <stop offset="0%" stop-color="#2c1e0b"/>
-      <stop offset="78%" stop-color="#241809"/>
-      <stop offset="100%" stop-color="#1c1206"/>
-    </radialGradient>`;
-  svg.appendChild(defs);
 
   const tip = document.getElementById("w3dTip");
   const { list, minY, maxY } = mainLinePeople(DB);
   const rnd = mkRand([...(list[0]?.p.id || "x")].reduce((a, c) => a + c.charCodeAt(0), 0));
 
-  // ——— поле и кольцо ———
-  const field = document.createElementNS(NS, "circle");
-  field.setAttribute("cx", CX); field.setAttribute("cy", CY); field.setAttribute("r", R + 26);
-  field.setAttribute("fill", "url(#field)");
-  svg.appendChild(field);
-  const growables = [];
-  for (const rr of [R + 26, R + 14]) {
-    const ring = document.createElementNS(NS, "circle");
-    ring.setAttribute("cx", CX); ring.setAttribute("cy", CY); ring.setAttribute("r", rr);
-    ring.setAttribute("fill", "none");
-    ring.setAttribute("stroke", GOLD_DIM);
-    ring.setAttribute("stroke-width", rr === R + 26 ? "2.6" : "1");
-    if (rr !== R + 26) ring.setAttribute("opacity", "0.55");
-    svg.appendChild(ring);
-    growables.push({ el: ring, birth: minY - 16, kind: "branch" });
-  }
-
   const g = document.createElementNS(NS, "g");
   svg.appendChild(g);
+  const growables = [];
 
-  // ————— фрактальное древо —————
-  // Сначала строим абстрактное дерево ветвления с ~N кончиками (N = число людей),
-  // затем раскладываем геометрию, затем назначаем людей кончикам по годам.
+  // ————— абстрактное дерево ветвления с ~N кончиками —————
   const N = list.length;
-  // структура: узел {children:[]}; растим до нужного числа листьев
   function buildShape(nTips) {
     const root = { children: [], depth: 0 };
     let leaves = [root];
     while (leaves.length < nTips) {
-      // берём самый «мелкий» лист, делим на 2–3
       leaves.sort((a, b) => a.depth - b.depth);
       const node = leaves.shift();
       const k = leaves.length + 2 < nTips && node.depth < 2 && rnd() < 0.5 ? 3 : 2;
@@ -101,20 +76,16 @@ export function mountDrevo(container, DB, ui) {
   }
   const shape = buildShape(N);
 
-  // геометрия: рекурсивный рост
-  const forkY = CY + R * 0.16;        // где ствол переходит в крону
-  const baseY = CY + R * 0.74;        // основание ствола
-  const tips = [];                     // {x,y,ang}
-  const branchEls = [];                // {el, gen} для послойной анимации
+  // ————— геометрия: рекурсивный рост, широкая крона —————
+  const tips = [];
+  const branchEls = [];
   let maxGen = 0;
-
   function grow(node, x, y, ang, len, width, gen) {
     maxGen = Math.max(maxGen, gen);
     const x2 = x + Math.sin(ang) * len;
     const y2 = y - Math.cos(ang) * len;
-    // изогнутая сужающаяся ветвь
-    const cbow = (rnd() - 0.5) * len * 0.5;
-    const nx = Math.cos(ang), ny = Math.sin(ang);   // нормаль к направлению
+    const cbow = (rnd() - 0.5) * len * 0.42;
+    const nx = Math.cos(ang), ny = Math.sin(ang);
     const mx = (x + x2) / 2 + nx * cbow, my = (y + y2) / 2 + ny * cbow;
     const path = document.createElementNS(NS, "path");
     path.setAttribute("d", `M ${x.toFixed(1)} ${y.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)}, ${x2.toFixed(1)} ${y2.toFixed(1)}`);
@@ -125,74 +96,66 @@ export function mountDrevo(container, DB, ui) {
     g.appendChild(path);
     branchEls.push({ el: path, gen });
 
-    if (!node.children.length) {
-      tips.push({ x: x2, y: y2, ang, gen });
-      return;
-    }
+    if (!node.children.length) { tips.push({ x: x2, y: y2, ang, gen }); return; }
     const k = node.children.length;
-    const spreadBase = 0.62 - gen * 0.04;
+    const spreadBase = 0.86 - gen * 0.03;      // сильный развал, крона раскидывается вширь
     node.children.forEach((ch, i) => {
       const off = (i - (k - 1) / 2) * (spreadBase / Math.max(1, k - 1) * 2 || spreadBase);
-      let childAng = ang + off + (rnd() - 0.5) * 0.12;
-      childAng *= 0.94;                              // мягко стремим вверх
-      const childLen = len * (0.70 + rnd() * 0.10);
+      // угол копится (без возврата к вертикали) → ветви уходят в стороны
+      const childAng = ang + off + (rnd() - 0.5) * 0.14;
+      const childLen = len * (0.76 + rnd() * 0.10);
       grow(ch, x2, y2, childAng, childLen, width * 0.72, gen + 1);
     });
   }
-  grow(shape, CX, forkY, 0, R * 0.30, 11, 0);
+  grow(shape, CX, forkY, 0, (forkY - 30) * 0.5, 13, 0);
 
-  // назначаем людей кончикам: раскладываем по x, чтобы старшие ближе к центру не важно —
-  // просто по порядку слева-направо к людям по годам (условная метафора)
+  // назначаем людей кончикам слева-направо
   tips.sort((a, b) => a.x - b.x);
-  const people = list.slice();
-  tips.forEach((t, i) => { t.person = people[i % people.length]?.p; t.birth = people[i % people.length]?.y; });
+  tips.forEach((t, i) => { t.person = list[i % list.length]?.p; t.birth = list[i % list.length]?.y; });
 
-  // ——— ствол ———
-  const trunkW = 46, neckW = 13;
+  // ————— ствол —————
+  const trunkW = 54, neckW = 15;
   const trunk = document.createElementNS(NS, "path");
   trunk.setAttribute("d", `
     M ${CX - trunkW / 2} ${baseY}
-    C ${CX - trunkW / 2 + 4} ${baseY - R * 0.34}, ${CX - neckW / 2 - 3} ${forkY + 40}, ${CX - neckW / 2} ${forkY}
+    C ${CX - trunkW / 2 + 5} ${baseY - (baseY - forkY) * 0.5}, ${CX - neckW / 2 - 4} ${forkY + 46}, ${CX - neckW / 2} ${forkY}
     L ${CX + neckW / 2} ${forkY}
-    C ${CX + neckW / 2 + 3} ${forkY + 40}, ${CX + trunkW / 2 - 4} ${baseY - R * 0.34}, ${CX + trunkW / 2} ${baseY} Z`);
+    C ${CX + neckW / 2 + 4} ${forkY + 46}, ${CX + trunkW / 2 - 5} ${baseY - (baseY - forkY) * 0.5}, ${CX + trunkW / 2} ${baseY} Z`);
   trunk.setAttribute("fill", GOLD_DIM);
   g.insertBefore(trunk, g.firstChild);
   growables.push({ el: trunk, birth: minY - 15, kind: "trunk", baseY });
 
-  // ——— корни + земля ———
-  for (let i = 0; i < 7; i++) {
-    const t = (i / 6 - 0.5) * 2;
-    const ex = CX + t * R * 0.5;
-    const ey = baseY + R * 0.16 - Math.abs(t) * R * 0.05;
+  // ————— корни + земля —————
+  for (let i = 0; i < 9; i++) {
+    const t = (i / 8 - 0.5) * 2;
+    const ex = CX + t * 240;
+    const ey = baseY + 58 - Math.abs(t) * 20;
     const root = document.createElementNS(NS, "path");
-    root.setAttribute("d", `M ${CX + t * 8} ${baseY - 4} Q ${CX + t * R * 0.2} ${baseY + R * 0.06}, ${ex.toFixed(1)} ${ey.toFixed(1)}`);
+    root.setAttribute("d", `M ${CX + t * 9} ${baseY - 4} Q ${CX + t * 90} ${baseY + 26}, ${ex.toFixed(1)} ${ey.toFixed(1)}`);
     root.setAttribute("stroke", GOLD_DIM);
-    root.setAttribute("stroke-width", (3.4 - Math.abs(t) * 1.8).toFixed(1));
+    root.setAttribute("stroke-width", (3.6 - Math.abs(t) * 1.9).toFixed(1));
     root.setAttribute("fill", "none");
     root.setAttribute("stroke-linecap", "round");
     g.appendChild(root);
     growables.push({ el: root, birth: minY - 15, kind: "branch" });
   }
-  for (let i = 0; i < 2; i++) {
-    const wy = baseY + R * 0.125 + i * 13, ww = R * (0.54 - i * 0.13);
-    const wave = document.createElementNS(NS, "path");
-    wave.setAttribute("d", `M ${CX - ww} ${wy} Q ${CX - ww / 2} ${wy - 9}, ${CX} ${wy} T ${CX + ww} ${wy}`);
-    wave.setAttribute("stroke", GOLD_DIM);
-    wave.setAttribute("stroke-width", "1.6");
-    wave.setAttribute("fill", "none");
-    wave.setAttribute("opacity", "0.72");
-    wave.setAttribute("stroke-linecap", "round");
-    g.appendChild(wave);
-    growables.push({ el: wave, birth: minY - 14, kind: "branch" });
-  }
+  const ground = document.createElementNS(NS, "path");
+  ground.setAttribute("d", `M ${CX - 300} ${baseY + 56} Q ${CX} ${baseY + 40}, ${CX + 300} ${baseY + 56}`);
+  ground.setAttribute("stroke", GOLD_DIM);
+  ground.setAttribute("stroke-width", "1.8");
+  ground.setAttribute("fill", "none");
+  ground.setAttribute("opacity", "0.6");
+  ground.setAttribute("stroke-linecap", "round");
+  g.appendChild(ground);
+  growables.push({ el: ground, birth: minY - 14, kind: "branch" });
 
-  // послойный «рост» ветвей во времени по поколению
+  // послойный рост ветвей
   for (const b of branchEls) {
     const frac = maxGen ? b.gen / maxGen : 0;
     growables.push({ el: b.el, birth: minY + frac * (maxY - minY), kind: "branch" });
   }
 
-  // ——— листья-люди на кончиках ———
+  // ————— листья-люди на кончиках —————
   for (const t of tips) {
     const p = t.person;
     const dead = !!p?.death;
@@ -202,13 +165,13 @@ export function mountDrevo(container, DB, ui) {
     g.appendChild(cluster);
     const inner = document.createElementNS(NS, "g");
     cluster.appendChild(inner);
-    const deg = (t.ang * 180 / Math.PI).toFixed(1);   // остриё вдоль ветви (наружу)
+    const deg = (t.ang * 180 / Math.PI).toFixed(1);
 
     const me = document.createElementNS(NS, "path");
     me.setAttribute("d", LEAF_D);
     if (dead) { me.setAttribute("fill", "none"); me.setAttribute("stroke", GOLD); me.setAttribute("stroke-width", "1.5"); }
     else me.setAttribute("fill", GOLD);
-    me.setAttribute("transform", `rotate(${deg}) translate(0 1) scale(1.32)`);
+    me.setAttribute("transform", `rotate(${deg}) translate(0 1) scale(1.4)`);
     me.classList.add("leaf-person", "leaf-live");
     me.style.animationDelay = (-rnd() * 7).toFixed(1) + "s";
     inner.appendChild(me);
@@ -217,7 +180,7 @@ export function mountDrevo(container, DB, ui) {
       d.setAttribute("d", LEAF_D);
       d.setAttribute("fill", GOLD);
       d.setAttribute("opacity", "0.85");
-      d.setAttribute("transform", `rotate(${(+deg + side * (32 + rnd() * 14)).toFixed(0)}) translate(0 3) scale(${(0.6 + rnd() * 0.2).toFixed(2)})`);
+      d.setAttribute("transform", `rotate(${(+deg + side * (32 + rnd() * 14)).toFixed(0)}) translate(0 3) scale(${(0.62 + rnd() * 0.22).toFixed(2)})`);
       d.classList.add("leaf-live");
       d.style.animationDelay = (-rnd() * 9).toFixed(1) + "s";
       inner.appendChild(d);
@@ -238,6 +201,16 @@ export function mountDrevo(container, DB, ui) {
       cluster.addEventListener("click", () => ui.onOpenPerson?.(p.id));
     }
     growables.push({ el: inner, birth: (t.birth ?? maxY) + 2, kind: "leaf" });
+  }
+
+  // ————— вписываем всё дерево в кадр (по фактическим границам) —————
+  {
+    const bb = g.getBBox();
+    const padX = 60, topY = 6, botY = H - 6;
+    const sc = Math.min((W - 2 * padX) / bb.width, (botY - topY) / bb.height);
+    const tx = W / 2 - (bb.x + bb.width / 2) * sc;
+    const ty = botY - (bb.y + bb.height) * sc;
+    g.setAttribute("transform", `translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${sc.toFixed(3)})`);
   }
 
   // ————— живая прорисовка —————
