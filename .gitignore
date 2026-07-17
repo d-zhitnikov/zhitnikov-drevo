@@ -1,0 +1,10 @@
+# приватные исходники экспорта: GEDCOM содержит email-адреса живых людей
+data/zhitnikov.ged
+data/media/
+data/photo_urls.txt
+data/dl.sh
+data/dl_fail.log
+data/geocode_cache.json
+docs/_sheet.html
+docs/_sheets/
+.DS_Store
