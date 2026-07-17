@@ -1,5 +1,5 @@
 // Древо рода Житниковых — одностраничное приложение.
-import { renderTree } from "./tree.js?v=d7";
+import { renderTree } from "./tree.js?v=d8";
 
 const app = document.getElementById("app");
 let DB = null;              // {persons, families}
@@ -195,8 +195,8 @@ async function initHome3D() {
   const heroEl = document.getElementById("hero3d");
   try {
     const [{ mountDrevo }, { mountMap }] = await Promise.all([
-      import("./drevo2d.js?v=d7"),
-      import("./map2d.js?v=d7"),
+      import("./drevo2d.js?v=d8"),
+      import("./map2d.js?v=d8"),
     ]);
     const stage = document.getElementById("hero3dStage");
     if (!stage) return; // уже ушли со страницы
