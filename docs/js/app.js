@@ -1,5 +1,5 @@
 // Древо рода Житниковых — одностраничное приложение.
-import { renderTree } from "./tree.js?v=d5";
+import { renderTree } from "./tree.js?v=d7";
 
 const app = document.getElementById("app");
 let DB = null;              // {persons, families}
@@ -145,18 +145,16 @@ function renderHome() {
 
   app.innerHTML = `
   <div class="hero3d" id="hero3d">
-    <div class="hero3d-ui">
-      <div class="hero3d-head">
-        <div class="hero3d-kicker">${minY} — ${maxY} · ${gens} поколений</div>
-        <h1>Древо рода<br><em>Житниковых</em></h1>
-        <div class="hero3d-sub">Каждая ветвь — человек. Каждый лист — жизнь.</div>
-        <div class="hero3d-cta">
-          <a class="btn btn-primary" href="#/tree">Открыть древо рода</a>
-          <a class="btn btn-ghost" href="#/timeline">Хроника</a>
-        </div>
+    <div class="hero3d-head">
+      <div class="hero3d-kicker">${minY} — ${maxY} · ${gens} поколений</div>
+      <h1>Древо рода<br><em>Житниковых</em></h1>
+      <div class="hero3d-sub">Каждая ветвь — человек. Каждый лист — жизнь.</div>
+      <div class="hero3d-cta">
+        <a class="btn btn-primary" href="#/tree">Открыть древо рода</a>
+        <a class="btn btn-ghost" href="#/timeline">Хроника</a>
       </div>
-
     </div>
+    <div class="hero3d-medallion" id="hero3dStage"></div>
   </div>
 
   <section class="globe-sec" id="globeSec">
@@ -197,11 +195,12 @@ async function initHome3D() {
   const heroEl = document.getElementById("hero3d");
   try {
     const [{ mountDrevo }, { mountMap }] = await Promise.all([
-      import("./drevo2d.js?v=d5"),
-      import("./map2d.js?v=d5"),
+      import("./drevo2d.js?v=d7"),
+      import("./map2d.js?v=d7"),
     ]);
-    if (!document.getElementById("hero3d")) return; // уже ушли со страницы
-    home3d.drevo = mountDrevo(heroEl, DB, {
+    const stage = document.getElementById("hero3dStage");
+    if (!stage) return; // уже ушли со страницы
+    home3d.drevo = mountDrevo(stage, DB, {
       onOpenPerson: (id) => { location.hash = `#/person/${id}`; },
     });
     home3d.globe = await mountMap(document.getElementById("globeStage"), DB, {

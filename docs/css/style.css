@@ -102,20 +102,15 @@ button { font: inherit; cursor: pointer; }
 }
 @keyframes bootpulse { 50% { transform: scale(.94); opacity: .82; } }
 
-/* ——— 3D-герой ——— */
+/* ——— герой: текст сверху, медальон-эмблема ниже ——— */
 .hero3d {
-  position: relative; height: calc(100vh - 67px); min-height: 560px;
+  position: relative; min-height: calc(100vh - 67px);
+  display: flex; flex-direction: column; align-items: center;
+  padding: clamp(22px, 5vh, 60px) 20px 40px;
   overflow: hidden;
-  background: radial-gradient(1200px 700px at 50% 100%, #221708 0%, #14100c 62%);
+  background: radial-gradient(1100px 760px at 50% 78%, #241708 0%, #14100c 66%);
 }
-.hero3d canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
-.hero3d::after {
-  content: ""; position: absolute; inset: 0 0 auto 0; height: 42%;
-  background: linear-gradient(to bottom, rgba(10,14,9,.78), rgba(10,14,9,.35) 55%, transparent);
-  z-index: 1; pointer-events: none;
-}
-.hero3d-ui { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; z-index: 2; }
-.hero3d-head { text-align: center; padding-top: clamp(18px, 4vh, 46px); }
+.hero3d-head { text-align: center; }
 .hero3d-kicker {
   font-family: var(--sans); font-size: 11.5px; font-weight: 600;
   letter-spacing: .34em; text-transform: uppercase; color: var(--amber);
@@ -129,33 +124,15 @@ button { font: inherit; cursor: pointer; }
 .hero3d-head h1 em { font-style: italic; color: var(--amber); }
 .hero3d-sub { margin-top: 10px; font-size: 14.5px; color: var(--ink-2); }
 .hero3d-cta {
-  margin-top: 18px; display: flex; gap: 12px; justify-content: center;
-  pointer-events: auto;
+  margin-top: 20px; display: flex; gap: 12px; justify-content: center;
 }
-.hero3d-foot {
-  margin-top: auto; padding: 0 26px calc(16px + env(safe-area-inset-bottom));
-  display: flex; align-items: flex-end; gap: 26px; pointer-events: none;
+.hero3d-medallion {
+  width: min(480px, 82vw); aspect-ratio: 1; margin-top: clamp(10px, 2vh, 26px);
+  flex: none;
 }
-.hero3d-legend {
-  display: flex; flex-direction: column; gap: 7px;
-  font-family: var(--sans); font-size: 12px; color: var(--ink-2);
-  background: color-mix(in srgb, var(--paper) 68%, transparent);
-  border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px;
-  backdrop-filter: blur(8px); pointer-events: auto;
-}
-.hero3d-legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50% 0 50% 50%; margin-right: 7px; vertical-align: -1px; }
-.year-box { margin-left: auto; text-align: right; pointer-events: auto; }
-.year-num {
-  font-family: var(--display); font-weight: 500; font-size: clamp(44px, 5vw, 72px);
-  line-height: 1; color: var(--amber); text-shadow: 0 0 34px rgba(216,165,78,.35);
-  font-variant-numeric: tabular-nums;
-}
-.year-slider { width: min(340px, 34vw); accent-color: var(--amber); margin-top: 8px; cursor: pointer; }
-.hero3d-hint { font-family: var(--sans); font-size: 11.5px; color: var(--ink-3); margin-top: 6px; }
-.hero3d.no3d canvas { display: none; }
 
 /* ——— 2D-сцены (SVG) ——— */
-.hero3d svg.drevo2d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
+.hero3d-medallion svg.drevo2d { width: 100%; height: 100%; display: block; }
 .leaf-hit { cursor: pointer; }
 .leaf-hit:hover .leaf-person { filter: brightness(1.45); }
 .leaf-live {
